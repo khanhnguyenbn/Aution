@@ -3,7 +3,7 @@
     <div class="b-row">
       <div>
         <h1>
-          Auction
+          Aution
           <span>#{{ amount }}</span>
         </h1>
         <hr>

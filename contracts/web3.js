@@ -18,4 +18,5 @@ if (window.ethereum) {
   );
 }
 console.log(web3);
+
 export default web3;
