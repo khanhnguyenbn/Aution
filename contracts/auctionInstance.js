@@ -4,6 +4,11 @@ const abi = [
 	{
 		"inputs": [
 			{
+				"internalType": "int256",
+				"name": "_id",
+				"type": "int256"
+			},
+			{
 				"internalType": "address payable",
 				"name": "_owner",
 				"type": "address"
@@ -68,6 +73,19 @@ const abi = [
 	},
 	{
 		"inputs": [],
+		"name": "getHighestPrice",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "highestBidder",
 		"outputs": [
 			{
@@ -94,6 +112,19 @@ const abi = [
 	},
 	{
 		"inputs": [],
+		"name": "id",
+		"outputs": [
+			{
+				"internalType": "int256",
+				"name": "",
+				"type": "int256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "placeBid",
 		"outputs": [
 			{
@@ -110,9 +141,19 @@ const abi = [
 		"name": "returnContents",
 		"outputs": [
 			{
+				"internalType": "int256",
+				"name": "",
+				"type": "int256"
+			},
+			{
 				"internalType": "string",
 				"name": "",
 				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
