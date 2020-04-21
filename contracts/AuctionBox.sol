@@ -1,19 +1,21 @@
-// We will be using Solidity version 0.5.3
-pragma solidity 0.5.3;
-// Importing OpenZeppelin's SafeMath Implementation
+
+pragma solidity 0.6.0;
+
 import "https://github.com/OpenZeppelin/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract AuctionBox{
-    Auction[] public auctions; 
+    
+    uint public count;
+    Auction[] public auctions;
    
     function createAuction (
         string memory _title,
         uint _startPrice,
         string memory _description
         ) public{
-        require(_startPrice > 0);
-        // set the new instanc
-        Auction newAuction = new Auction(msg.sender, _title, _startPrice, _description);
+            count = count + 1;
+        // set the new instance
+        Auction newAuction = new Auction(count, msg.sender, _title, _startPrice, _description);
         // push the auction address to auctions array
         auctions.push(newAuction);
     }
@@ -21,12 +23,21 @@ contract AuctionBox{
     function returnAllAuctions() public view returns(Auction[] memory){
         return auctions;
     }
+    
+    function getAuctionById(uint _id) public view returns(Auction){
+        for(uint i = 0; i < auctions.length; i++) {
+            if(auctions[i].getId() == _id) {
+                return auctions[i];
+            }
+        }
+    }
 }
 
 contract Auction {
     
     using SafeMath for uint256;
     
+    uint public id;
     address payable private owner; 
     string title;
     uint startPrice;
@@ -39,6 +50,9 @@ contract Auction {
     address payable public highestBidder;
     mapping(address => uint) public bids;
     
+    // to save history of bid tracsaction
+    mapping(address => uint[]) public bidsHistory;
+    
     /** @dev constructor to creat an auction
       * @param _owner who call createAuction() in AuctionBox contract
       * @param _title the title of the auction
@@ -47,6 +61,7 @@ contract Auction {
       */
       
     constructor(
+        uint _id,
         address payable _owner,
         string memory _title,
         uint _startPrice,
@@ -54,6 +69,7 @@ contract Auction {
         
         ) public {
         // initialize auction
+        id = _id;
         owner = _owner;
         title = _title;
         startPrice = _startPrice;
@@ -72,7 +88,7 @@ contract Auction {
     
     function placeBid() public payable notOwner returns(bool) {
         require(auctionState == State.Running);
-        require(msg.value > 0);
+        require(msg.value > startPrice);
         // update the current bid
         // uint currentBid = bids[msg.sender] + msg.value;
         uint currentBid = bids[msg.sender].add(msg.value);
@@ -82,6 +98,8 @@ contract Auction {
         // update the highest price
         highestPrice = currentBid;
         highestBidder = msg.sender;
+        
+        bidsHistory[msg.sender].push(msg.value);
         
         return true;
     }
@@ -121,18 +139,35 @@ contract Auction {
       * @return the state of the auction 
       */    
     
-    function returnContents() public view returns(        
+    function returnContents() public view returns( 
+        uint,
         string memory,
+        uint,
         uint,
         string memory,
         State
         ) {
         return (
+            id,
             title,
             startPrice,
+            highestPrice,
             description,
             auctionState
         );
     }
     
+    function getId() public view returns(uint){
+        return id;
+    }
+    
+    function getHighestPrice() public view returns(uint) {
+        
+        return highestPrice;
+    }
+    
+    function getBidHistoryByAdress(address _senderAddress) public view returns(uint[] memory){
+        
+        return bidsHistory[_senderAddress];
+    }
 }

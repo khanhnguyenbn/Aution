@@ -60,7 +60,7 @@
 
 <script>
 export default {
-    name: 'HelloWorld',
+    name: 'AutionDetail',
     data() {
         return {
             msg: "hfsdajhfasdf"

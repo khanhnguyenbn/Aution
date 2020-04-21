@@ -1,6 +1,6 @@
 import web3 from './web3';
 
-const address = '0x74dE6180B4aaA307A37c79Bc00FD27B82b70f30a'; // THE CONTRACT ADDRESS
+const address = '0xC3C9009Fcfa7C66a9c50B24aF21d7962a1729852'; // THE CONTRACT ADDRESS
 const abi = [
 	{
 		"inputs": [
@@ -49,9 +49,28 @@ const abi = [
 		"name": "count",
 		"outputs": [
 			{
-				"internalType": "int256",
+				"internalType": "uint256",
 				"name": "",
-				"type": "int256"
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "getAuctionById",
+		"outputs": [
+			{
+				"internalType": "contract Auction",
+				"name": "",
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
