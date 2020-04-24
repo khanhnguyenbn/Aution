@@ -21,7 +21,7 @@
                 <img src="http://placekitten.com/400/252" />
               </div>
             </div>
-            <ul class="preview-thumbnail nav nav-tabs">
+            <!-- <ul class="preview-thumbnail nav nav-tabs">
               <li class="active">
                 <a data-target="#pic-1" data-toggle="tab">
                   <img src="http://placekitten.com/200/126" />
@@ -47,7 +47,7 @@
                   <img src="http://placekitten.com/200/126" />
                 </a>
               </li>
-            </ul>
+            </ul> -->
           </div>
           <div class="details col-md-6">
             <h3 class="product-title">{{title}}</h3>
@@ -97,6 +97,12 @@
                 @click="handleFinalize()"
               >Finalize</button>
             </div>
+
+            <div>
+              <b>FOR WINNER:</b>
+              <button type="button" @click="handleReceived()">RECEIVED</button>
+              <button type="button" @click="handleCanotReceive()">CAN'T RECEIVE</button>
+            </div>
           </div>
         </div>
       </div>
@@ -110,10 +116,9 @@
       </form>
     </b-modal>
 
-    <h2>Your Bid History</h2>
-
-    <div class="row">
+    <div class="row" style="margin-top: 20px">
       <div class="col-sm-3">
+        <h2>Your Bid History</h2>
         <table>
           <thead>
             <tr>
@@ -128,6 +133,12 @@
             </tr>
           </tbody>
         </table>
+      </div>
+      <div class="col-sm-9 text-center">
+        <h3>Owner Information</h3>
+        <h6>Name: {{ownerName}}</h6>
+        <h6>Phone number: {{ownerPhoneNumber}}</h6>
+        <h6>Address: {{ownerAddress}}</h6>
       </div>
     </div>
   </div>
@@ -148,6 +159,9 @@ export default {
       highestPrice: Number,
       description: "",
       auctionState: "",
+      ownerName: "",
+      ownerPhoneNumber: "",
+      ownerAddress: "",
       bidPrice: "",
       auctionAddress: "",
       bidsHistory: []
@@ -161,6 +175,14 @@ export default {
         console.log("aution: " + aution);
         this.auctionAddress = aution;
         this.getBidsHistory(aution);
+
+        auction(aution)
+          .methods.getLengthOfBidList()
+          .call()
+          .then(len => {
+            console.log("len is " + len);
+          });
+
         auction(aution)
           .methods.returnContents()
           .call()
@@ -173,8 +195,11 @@ export default {
             this.title = list[1];
             this.startPrice = web3.utils.fromWei(list[2], "ether");
             this.highestPrice = web3.utils.fromWei(list[3], "ether");
-            this.auctionState = list[5];
             this.description = list[4];
+            this.auctionState = list[5];
+            this.ownerName = list[6];
+            this.ownerPhoneNumber = list[7],
+            this.ownerAddress = list[8]
           });
       });
   },
@@ -239,12 +264,53 @@ export default {
         .then(listHistory => {
           for (let index = 0; index < listHistory.length; index++) {
             console.log("listHistory: " + listHistory[index]);
-            const bidHistoryObject = {id: "", amount: ""}
+            const bidHistoryObject = { id: "", amount: "" };
             bidHistoryObject.id = index;
-            bidHistoryObject.amount = web3.utils.fromWei(listHistory[index], "ether");
+            bidHistoryObject.amount = web3.utils.fromWei(
+              listHistory[index],
+              "ether"
+            );
             this.bidsHistory.push(bidHistoryObject);
           }
         });
+    },
+    handleReceived() {
+      web3.eth.getAccounts().then(accounts => {
+        console.log("accounts[0]" + accounts[0]);
+        console.log(
+          "given: " + web3.eth.accounts.givenProvider.selectedAddress
+        );
+        // set the address as the parameter
+        const selectedAuction = auction(this.auctionAddress);
+        // finalizeAuction in Auction contract
+        selectedAuction.methods
+          .sendToOwner()
+          .send({ from: accounts[0] })
+          .then(() => {
+            // this.isFin = false;
+            // this.finalizeStatus = "finalized";
+          });
+      });
+
+      // console.log("Clicked ... ");
+    },
+    handleCanotReceive() {
+      web3.eth.getAccounts().then(accounts => {
+        console.log("accounts[0]" + accounts[0]);
+        console.log(
+          "given: " + web3.eth.accounts.givenProvider.selectedAddress
+        );
+        // set the address as the parameter
+        const selectedAuction = auction(this.auctionAddress);
+        // finalizeAuction in Auction contract
+        selectedAuction.methods
+          .refunForHighestBidder()
+          .send({ from: accounts[0] })
+          .then(() => {
+            // this.isFin = false;
+            // this.finalizeStatus = "finalized";
+          });
+      });
     }
   }
 };

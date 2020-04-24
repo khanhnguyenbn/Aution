@@ -27,6 +27,21 @@ const abi = [
 				"internalType": "string",
 				"name": "_description",
 				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_ownerName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_ownerPhoneNumber",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_ownerAddress",
+				"type": "string"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -89,6 +104,25 @@ const abi = [
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "bidsList",
+		"outputs": [
+			{
+				"internalType": "address payable",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "finalizeAuction",
 		"outputs": [],
@@ -142,6 +176,19 @@ const abi = [
 	},
 	{
 		"inputs": [],
+		"name": "getLengthOfBidList",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "highestBidder",
 		"outputs": [
 			{
@@ -181,6 +228,45 @@ const abi = [
 	},
 	{
 		"inputs": [],
+		"name": "ownerAddress",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "ownerName",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "ownerPhoneNumber",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "placeBid",
 		"outputs": [
 			{
@@ -190,6 +276,13 @@ const abi = [
 			}
 		],
 		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "refunForHighestBidder",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -225,9 +318,31 @@ const abi = [
 				"internalType": "enum Auction.State",
 				"name": "",
 				"type": "uint8"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "sendToOwner",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]; // THE ABI

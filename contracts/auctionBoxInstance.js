@@ -1,6 +1,6 @@
 import web3 from './web3';
 
-const address = '0xC3C9009Fcfa7C66a9c50B24aF21d7962a1729852'; // THE CONTRACT ADDRESS
+const address = '0xDE73bD7E7F22665D1b8c6d4750154EA834330272'; // THE CONTRACT ADDRESS
 const abi = [
 	{
 		"inputs": [
@@ -17,6 +17,21 @@ const abi = [
 			{
 				"internalType": "string",
 				"name": "_description",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_ownerName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_ownerPhoneNumber",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_ownerAddress",
 				"type": "string"
 			}
 		],
