@@ -47,7 +47,7 @@
                   <img src="http://placekitten.com/200/126" />
                 </a>
               </li>
-            </ul> -->
+            </ul>-->
           </div>
           <div class="details col-md-6">
             <h3 class="product-title">{{title}}</h3>
@@ -59,7 +59,7 @@
                 <span class="fa fa-star"></span>
                 <span class="fa fa-star"></span>
               </div>
-              <span class="review-no">bidder:</span>
+              <span class="review-no">end-date: {{endDate}}</span>
             </div>
             <p class="product-description">{{description}}</p>
             <h4 class="price">
@@ -87,18 +87,26 @@
             </h5>-->
             <div class="action">
               <button
+                v-if="isAllowBid"
                 class="add-to-cart btn btn-default"
                 type="button"
                 v-b-modal.modal-prevent-closing
               >BID</button>
               <button
+                v-if="isAllowFinalize"
                 class="add-to-cart btn btn-default"
                 type="button"
                 @click="handleFinalize()"
               >Finalize</button>
+              <button
+                v-if="isAllowRefunForFailBidder"
+                class="add-to-cart btn btn-default"
+                type="button"
+                @click="handleRefunCauseOverTime()"
+              >Refun cause overtime</button>
             </div>
 
-            <div>
+            <div v-if="isAllowWinnerDoAfter">
               <b>FOR WINNER:</b>
               <button type="button" @click="handleReceived()">RECEIVED</button>
               <button type="button" @click="handleCanotReceive()">CAN'T RECEIVE</button>
@@ -148,6 +156,8 @@
 import web3 from "../../contracts/web3";
 import auction from "../../contracts/auctionInstance";
 import auctionBox from "../../contracts/auctionBoxInstance";
+import TimeConverterUtil from "../Utils/TimeConverterUtil";
+import AuctionUtil from "../Utils/AuctionUtil"
 
 export default {
   name: "AutionDetail",
@@ -162,9 +172,15 @@ export default {
       ownerName: "",
       ownerPhoneNumber: "",
       ownerAddress: "",
+      endDate: "",
       bidPrice: "",
       auctionAddress: "",
-      bidsHistory: []
+      bidsHistory: [],
+
+      isAllowBid: false,
+      isAllowFinalize: false,
+      isAllowWinnerDoAfter: false,
+      isAllowRefunForFailBidder: false,
     };
   },
   beforeMount() {
@@ -187,20 +203,63 @@ export default {
           .methods.returnContents()
           .call()
           .then(list => {
-            console.log("list0: " + list[0]);
-            console.log("list1: " + list[1]);
-            console.log("list2: " + list[2]);
-            console.log("list3: " + list[3]);
             this.id = list[0];
             this.title = list[1];
             this.startPrice = web3.utils.fromWei(list[2], "ether");
             this.highestPrice = web3.utils.fromWei(list[3], "ether");
             this.description = list[4];
-            this.auctionState = list[5];
-            this.ownerName = list[6];
-            this.ownerPhoneNumber = list[7],
-            this.ownerAddress = list[8]
+            this.auctionState = AuctionUtil.getStringState(Number(list[5]));
+            let ownerInfoList = list[6];
+            this.ownerName = ownerInfoList[0];
+            this.ownerPhoneNumber = ownerInfoList[1];
+            this.ownerAddress = ownerInfoList[2];
+
+            this.endDate = TimeConverterUtil.toString(Number(list[8]));
           });
+
+        auction(aution)
+          .methods.isAllowBid(
+            web3.eth.accounts.givenProvider.selectedAddress,
+            new Date().getTime()
+          )
+          .call()
+          .then(isAllow => {
+            this.isAllowBid = isAllow;
+            console.log("isAllowBid: " + isAllow);
+          });
+
+          auction(aution)
+          .methods.isAllowFinalize(
+            web3.eth.accounts.givenProvider.selectedAddress
+          )
+          .call()
+          .then(isAllow => {
+            this.isAllowFinalize = isAllow;
+            console.log("isAllowFinalize: " + isAllow);
+          });
+
+          auction(aution)
+          .methods.isAllowWinnerDoAfter(
+            web3.eth.accounts.givenProvider.selectedAddress
+          )
+          .call()
+          .then(isAllow => {
+            this.isAllowWinnerDoAfter = isAllow;
+            console.log("isAllowWinnerDoAfter: " + isAllow);
+          });
+
+          auction(aution)
+          .methods.isAllowRefun(
+            web3.eth.accounts.givenProvider.selectedAddress,
+            new Date().getTime()
+          )
+          .call()
+          .then(isAllow => {
+            this.isAllowRefunForFailBidder = isAllow;
+            console.log("isAllowRefunForFailBidder: " + isAllow);
+          });
+
+          
       });
   },
   methods: {
@@ -305,6 +364,24 @@ export default {
         // finalizeAuction in Auction contract
         selectedAuction.methods
           .refunForHighestBidder()
+          .send({ from: accounts[0] })
+          .then(() => {
+            // this.isFin = false;
+            // this.finalizeStatus = "finalized";
+          });
+      });
+    },
+    handleRefunCauseOverTime() {
+      web3.eth.getAccounts().then(accounts => {
+        console.log("accounts[0]" + accounts[0]);
+        console.log(
+          "given: " + web3.eth.accounts.givenProvider.selectedAddress
+        );
+        // set the address as the parameter
+        const selectedAuction = auction(this.auctionAddress);
+        // finalizeAuction in Auction contract
+        selectedAuction.methods
+          .refunForFaileBidder(new Date().getTime())
           .send({ from: accounts[0] })
           .then(() => {
             // this.isFin = false;

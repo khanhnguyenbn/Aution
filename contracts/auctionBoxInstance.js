@@ -1,7 +1,7 @@
 import web3 from './web3';
 
-const address = '0xDE73bD7E7F22665D1b8c6d4750154EA834330272'; // THE CONTRACT ADDRESS
-const abi = [
+const address = '0xF0946D07556778De1655C3ef76B1EA772835575C'; // THE CONTRACT ADDRESS
+const abi =[
 	{
 		"inputs": [
 			{
@@ -20,22 +20,52 @@ const abi = [
 				"type": "string"
 			},
 			{
-				"internalType": "string",
-				"name": "_ownerName",
-				"type": "string"
+				"components": [
+					{
+						"internalType": "string",
+						"name": "ownerName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "ownerPhoneNumber",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "ownerAddress",
+						"type": "string"
+					}
+				],
+				"internalType": "struct UserInformation.owner",
+				"name": "_ownerInformation",
+				"type": "tuple"
 			},
 			{
-				"internalType": "string",
-				"name": "_ownerPhoneNumber",
-				"type": "string"
+				"internalType": "uint256",
+				"name": "_startTime",
+				"type": "uint256"
 			},
 			{
-				"internalType": "string",
-				"name": "_ownerAddress",
-				"type": "string"
+				"internalType": "uint256",
+				"name": "_endTime",
+				"type": "uint256"
 			}
 		],
 		"name": "createAuction",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_currentTime",
+				"type": "uint256"
+			}
+		],
+		"name": "finalizeWhenOverTime",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -86,6 +116,25 @@ const abi = [
 				"internalType": "contract Auction",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_currentTime",
+				"type": "uint256"
+			}
+		],
+		"name": "isHasAuctionOverTime",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",

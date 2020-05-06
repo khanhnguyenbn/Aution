@@ -29,19 +29,36 @@ const abi = [
 				"type": "string"
 			},
 			{
-				"internalType": "string",
-				"name": "_ownerName",
-				"type": "string"
+				"components": [
+					{
+						"internalType": "string",
+						"name": "ownerName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "ownerPhoneNumber",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "ownerAddress",
+						"type": "string"
+					}
+				],
+				"internalType": "struct UserInformation.owner",
+				"name": "_ownerInformation",
+				"type": "tuple"
 			},
 			{
-				"internalType": "string",
-				"name": "_ownerPhoneNumber",
-				"type": "string"
+				"internalType": "uint256",
+				"name": "_startTime",
+				"type": "uint256"
 			},
 			{
-				"internalType": "string",
-				"name": "_ownerAddress",
-				"type": "string"
+				"internalType": "uint256",
+				"name": "_endTime",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -124,7 +141,33 @@ const abi = [
 	},
 	{
 		"inputs": [],
+		"name": "endTime",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "finalizeAuction",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_currentTime",
+				"type": "uint256"
+			}
+		],
+		"name": "finalizeBySystem",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -227,39 +270,105 @@ const abi = [
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "ownerAddress",
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_senderAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_currentTime",
+				"type": "uint256"
+			}
+		],
+		"name": "isAllowBid",
 		"outputs": [
 			{
-				"internalType": "string",
+				"internalType": "bool",
 				"name": "",
-				"type": "string"
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "ownerName",
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_senderAddress",
+				"type": "address"
+			}
+		],
+		"name": "isAllowFinalize",
 		"outputs": [
 			{
-				"internalType": "string",
+				"internalType": "bool",
 				"name": "",
-				"type": "string"
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "ownerPhoneNumber",
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_senderAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_currentTime",
+				"type": "uint256"
+			}
+		],
+		"name": "isAllowRefun",
 		"outputs": [
 			{
-				"internalType": "string",
+				"internalType": "bool",
 				"name": "",
-				"type": "string"
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_currentTime",
+				"type": "uint256"
+			}
+		],
+		"name": "isAllowSystemFinalize",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_senderAddress",
+				"type": "address"
+			}
+		],
+		"name": "isAllowWinnerDoAfter",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -276,6 +385,19 @@ const abi = [
 			}
 		],
 		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_currentTime",
+				"type": "uint256"
+			}
+		],
+		"name": "refunForFaileBidder",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -320,19 +442,36 @@ const abi = [
 				"type": "uint8"
 			},
 			{
-				"internalType": "string",
+				"components": [
+					{
+						"internalType": "string",
+						"name": "ownerName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "ownerPhoneNumber",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "ownerAddress",
+						"type": "string"
+					}
+				],
+				"internalType": "struct UserInformation.owner",
 				"name": "",
-				"type": "string"
+				"type": "tuple"
 			},
 			{
-				"internalType": "string",
+				"internalType": "uint256",
 				"name": "",
-				"type": "string"
+				"type": "uint256"
 			},
 			{
-				"internalType": "string",
+				"internalType": "uint256",
 				"name": "",
-				"type": "string"
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -343,6 +482,19 @@ const abi = [
 		"name": "sendToOwner",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "startTime",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	}
 ]; // THE ABI

@@ -13,6 +13,7 @@
     "bootstrap": ">=4.3.1",
     "bootstrap-vue": "^2.0.0-rc.11",
     "vue": "^2.6.6",
+    "vuejs-datetimepicker": "^1.1.13",
     "web3": "^1.0.0-beta.37"
   },
   "browserslist": [
@@ -24,6 +25,8 @@
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.0",
+    "babel-preset-es2016": "^6.24.1",
+    "babel-preset-stage-2": "~6.24.1",
     "babel-preset-stage-3": "^6.24.1",
     "cross-env": "^5.0.5",
     "css-loader": "^0.28.7",

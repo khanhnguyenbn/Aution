@@ -9,6 +9,8 @@
           <th>Start Price</th>
           <th>Highest Price</th>
           <th>State</th>
+          <th>Start Time</th>
+          <th>End Time</th>
         </tr>
       </thead>
       <tbody>
@@ -21,7 +23,9 @@
           </td>
           <td>{{aution.startPrice}}</td>
           <td>{{aution.highestPrice}}</td>
-          <td>{{aution.state}}</td>
+          <td>{{getStringState(Number(aution.state))}}</td>
+          <td>{{aution.startTime}}</td>
+          <td>{{aution.endTime}}</td>
         </tr>
       </tbody>
     </table>
@@ -50,9 +54,14 @@
           />
         </div>
         <div>
+          <label>End Datetime</label>
+          <datetime format="YYYY-MM-DD h:i" v-model="endDate"></datetime>
+        </div>
+        <div>
           <label for="Description">Description</label>
           <b-form-textarea id="Description" v-model="description" rows="5" />
         </div>
+
       </b-col>
 
       <b-col class="b-row">
@@ -126,9 +135,15 @@
 import web3 from "../../contracts/web3";
 import auction from "../../contracts/auctionInstance";
 import auctionBox from "../../contracts/auctionBoxInstance";
+import datetime from "vuejs-datetimepicker";
+import  TimeConverterUtil from "../Utils/TimeConverterUtil"
+import AuctionUtil from "../Utils/AuctionUtil"
 
 export default {
   name: "aution-table",
+  components: {
+    datetime
+  },
   data() {
     return {
       title: "",
@@ -138,6 +153,7 @@ export default {
       name: "",
       phoneNumber: "",
       address: "",
+      endDate: "",
       amount: 0,
       auctionCard: [],
       autionList: [],
@@ -174,13 +190,17 @@ export default {
                 title: "",
                 startPrice: "",
                 highestPrice: "",
-                state: ""
+                state: Number,
+                startTime: "",
+                endTime: ""
               };
               autionInfo.id = list[0];
               autionInfo.title = list[1];
               autionInfo.startPrice = web3.utils.fromWei(list[2], "ether");
               autionInfo.highestPrice = web3.utils.fromWei(list[3], "ether");
               autionInfo.state = list[5];
+              autionInfo.startTime = TimeConverterUtil.toString(Number(list[7]));
+              autionInfo.endTime = TimeConverterUtil.toString(Number(list[8]));
               this.autionList.push(autionInfo);
             });
         }
@@ -189,6 +209,8 @@ export default {
   methods: {
     createAuction() {
       // get accounts
+
+      console.log("endDate: " + Date.parse(this.endDate));
       web3.eth
         .getAccounts()
         .then(accounts => {
@@ -197,7 +219,14 @@ export default {
           // createAuction in AuctionBox contract
           this.isLoad = true;
           return auctionBox.methods
-            .createAuction(this.title, startPrice, this.description, this.name, this.phoneNumber, this.address)
+            .createAuction(
+              this.title,
+              startPrice,
+              this.description,
+              [this.name, this.phoneNumber, this.address],
+              new Date().getTime(),
+              Date.parse(this.endDate)
+            )
             .send({ from: accounts[0] });
         })
         .then(() => {
@@ -234,7 +263,7 @@ export default {
           this.isShow = true;
           this.amount += 1;
 
-          var autionInfo = { id: "", title: "", startPrice: ""};
+          var autionInfo = { id: "", title: "", startPrice: "" };
           autionInfo.id = index;
           autionInfo.title = list[0];
           autionInfo.startPrice = list[1];
@@ -287,6 +316,10 @@ export default {
             this.finalizeStatus = "finalized";
           });
       });
+    },
+    getStringState(numberState) {
+      console.log("xxxxxxxxxxxxxxxxx");
+      return AuctionUtil.getStringState(numberState);
     }
   }
 };
