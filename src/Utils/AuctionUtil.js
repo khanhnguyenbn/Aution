@@ -4,7 +4,6 @@ function getStringState(state) {
         case 0:
             return "DEFAULT";
         case 1:
-            console.log("util ne");
             return "RUNNING";
         case 2:
             return "FINALIZE";
