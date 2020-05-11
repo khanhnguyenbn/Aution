@@ -69,32 +69,59 @@ contract Auction {
     
     using SafeMath for uint256;
     
+    // id of auction
     uint public id;
+    
+    // address of owner that create this auction
     address payable private owner; 
+    
     string title;
+    
     uint startPrice;
+    
     string description;
 
-    enum State{Default, Running, Finalized, Done, Faile}
+    // save list state that system has
+    enum State{Default, Running, Finalized, Money_Transfered, Done, Faile}
+    
+    // save current state of auction
     State public auctionState;
 
+    // save value of highestBidder
     uint public highestPrice;
+    
+    // save address of highestBidder
     address payable public highestBidder;
+    
+    // save address and value of bidders
     mapping(address => uint) public bids;
-    address payable[] public bidsList;
     
-    // string public ownerName;
-    // string public ownerPhoneNumber;
-    // string public ownerAddress;
+    // save address and money deposit of bidders
+    mapping(address => uint) public deposit;
     
+    // save address of depositer
+    address payable[] public depositList;
+    
+    
+    // save money of winner after end bidding time
+    mapping(address => uint) public winnerPayment;
+    
+    // save owner information
     UserInformation.owner ownerInformation;
     
+    // save time that owner create auction
     uint public startTime;
+    
+    // time to end bidding
     uint public endTime;
     
     
     // to save history of bid tracsaction
     mapping(address => uint[]) public bidsHistory;
+    
+    
+    
+    ///////// Function ////////////////////
     
     /** @dev constructor to creat an auction
       * @param _owner who call createAuction() in AuctionBox contract
@@ -137,20 +164,26 @@ contract Auction {
         _;
     }
     
-    /** @dev Function to place a bid
-      * @return true
-      */
-    
-    function placeBid() public payable notOwner returns(bool) {
-        require(auctionState == State.Running);
-        // require(msg.value > startPrice);
-        // update the current bid
-        // uint currentBid = bids[msg.sender] + msg.value;
+      
+    function payDeposit() public payable notOwner returns(bool) {
         
-        if(bids[msg.sender] == 0){
-            bidsList.push(msg.sender);
-        }
-        uint currentBid = bids[msg.sender].add(msg.value);
+        require(auctionState == State.Running);
+        require(deposit[msg.sender] == 0);
+        
+        deposit[msg.sender] = msg.value;
+        depositList.push(msg.sender);
+        
+        return true;
+        
+    }
+    
+    
+    function placeBid(uint _amount) public returns(bool) {
+        require(auctionState == State.Running);
+        require(msg.sender != owner);
+        require(_amount >= startPrice, "your bid must greater than equal startPrice");
+        
+        uint currentBid = _amount;
         require(currentBid > highestPrice);
         // set the currentBid links with msg.sender
         bids[msg.sender] = currentBid;
@@ -158,7 +191,7 @@ contract Auction {
         highestPrice = currentBid;
         highestBidder = msg.sender;
         
-        bidsHistory[msg.sender].push(msg.value);
+        bidsHistory[msg.sender].push(_amount);
         
         return true;
     }
@@ -193,11 +226,11 @@ contract Auction {
         require(auctionState == State.Running);
         require(msg.sender == owner);
         
-        for(uint i = 0; i < bidsList.length; i++) {
-            if(bidsList[i] != highestBidder){
+        for(uint i = 0; i < depositList.length; i++) {
+            if(depositList[i] != highestBidder){
                 
-                address payable recipiant = bidsList[i];
-                uint value = bids[recipiant];
+                address payable recipiant = depositList[i];
+                uint value = deposit[recipiant];
                 recipiant.transfer(value);
                 bids[recipiant] = 0;
             }
@@ -210,13 +243,13 @@ contract Auction {
     function finalizeBySystem(uint _currentTime) public {
         
         if(isAllowSystemFinalize(_currentTime)){
-            for(uint i = 0; i < bidsList.length; i++) {
-                if(bidsList[i] != highestBidder){
+            for(uint i = 0; i < depositList.length; i++) {
+                if(depositList[i] != highestBidder){
                 
-                    address payable recipiant = bidsList[i];
-                    uint value = bids[recipiant];
+                    address payable recipiant = depositList[i];
+                    uint value = deposit[recipiant];
                     recipiant.transfer(value);
-                    bids[recipiant] = 0;
+                    deposit[recipiant] = 0;
                 }
             }
             
@@ -224,45 +257,77 @@ contract Auction {
         }
     }
     
-    function refunForFaileBidder(uint _currentTime) public {
-        require(auctionState == State.Running);
-        require(msg.sender != owner);
-        require(_currentTime > endTime);
-        require(bidsList.length > 0);
-        for(uint i = 0; i < bidsList.length; i++) {
-            if(bidsList[i] != highestBidder){
-                
-                address payable recipiant = bidsList[i];
-                uint value = bids[recipiant];
-                recipiant.transfer(value);
-                bids[recipiant] = 0;
-            }
-        }
+    function payMoneyOfWinner() public payable returns(bool) {
+        require(auctionState == State.Finalized);
+        require(msg.sender == highestBidder, "Is not highestBidder");
         
-        auctionState = State.Finalized;
+        uint amountWinnerSend = highestPrice - deposit[msg.sender];
+        require(msg.value == amountWinnerSend, "Is not highestPrice");
+        
+        winnerPayment[msg.sender] = msg.value;
+        
+        auctionState = State.Money_Transfered;
+        
+        return true;
     }
+    
+    function getDeposit(address _senderAddress) public view returns (uint) {
+        if(deposit[_senderAddress] > 0) {
+            return deposit[_senderAddress];
+        } else {
+            return 0;
+        }
+    }
+    
+    // function refunForFaileBidder(uint _currentTime) public {
+    //     require(auctionState == State.Running);
+    //     require(msg.sender != owner);
+    //     require(_currentTime > endTime);
+    //     require(bidsList.length > 0);
+    //     for(uint i = 0; i < bidsList.length; i++) {
+    //         if(bidsList[i] != highestBidder){
+                
+    //             address payable recipiant = bidsList[i];
+    //             uint value = bids[recipiant];
+    //             recipiant.transfer(value);
+    //             bids[recipiant] = 0;
+    //         }
+    //     }
+        
+    //     auctionState = State.Finalized;
+    // }
     
     function sendToOwner() public {
         
-        require(auctionState == State.Finalized);
+        require(auctionState == State.Money_Transfered);
         require(msg.sender == highestBidder);
         
-        owner.transfer(bids[highestBidder]);
+        owner.transfer(winnerPayment[highestBidder] + deposit[msg.sender]);
         auctionState = State.Done;
         
     }
     
     function refunForHighestBidder() public {
-        require(auctionState == State.Finalized);
+        require(auctionState == State.Money_Transfered);
         require(msg.sender == highestBidder);
         
-        highestBidder.transfer(bids[highestBidder]);
+        highestBidder.transfer(winnerPayment[highestBidder] + deposit[highestBidder]);
         auctionState = State.Faile;
+    }
+    
+    function isAllowDeposit(address _senderAddress, uint _currentTime) public view returns (bool) {
+       
+       if(auctionState == State.Running && _senderAddress != owner && deposit[_senderAddress] == 0 && _currentTime < endTime) {
+           
+           return true;
+       } else {
+           return false;
+       }
     }
     
     function isAllowBid(address _senderAddress, uint _currentTime) public view returns (bool){
         
-        if (_senderAddress != owner && auctionState == State.Running && _currentTime < endTime){
+        if (_senderAddress != owner && auctionState == State.Running && deposit[_senderAddress] > 0 && _currentTime < endTime){
             return true;
         } else {
             return false;
@@ -278,6 +343,7 @@ contract Auction {
         }
     }
     
+    
     function isAllowRefun(address _senderAddress, uint _currentTime) public view returns (bool) {
         if (_senderAddress != owner && _currentTime > endTime && auctionState == State.Running) {
             return true;
@@ -286,8 +352,17 @@ contract Auction {
         }
     }
     
+    function isAllowDisplayWinner() public view returns (bool) {
+        
+        if(auctionState != State.Running) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     function isAllowWinnerDoAfter(address _senderAddress) public view returns (bool){
-        if (auctionState == State.Finalized && _senderAddress == highestBidder) {
+        if (auctionState == State.Money_Transfered && _senderAddress == highestBidder) {
             return true;
         } else {
             return false;
@@ -296,6 +371,15 @@ contract Auction {
     
     function isAllowSystemFinalize (uint _currentTime) public view returns (bool){
         if (auctionState == State.Running && _currentTime >= endTime) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    function isAllowWinnerTransferMoney(address _senderAddress) public view returns (bool) {
+        
+        if(auctionState == State.Finalized && _senderAddress == highestBidder) {
             return true;
         } else {
             return false;
@@ -351,10 +435,10 @@ contract Auction {
         return bidsHistory[_senderAddress];
     }
     
-    function getLengthOfBidList() public view returns (uint) {
+    // function getLengthOfBidList() public view returns (uint) {
         
-        return bidsList.length;
-    }
+    //     return bidsList.length;
+    // }
     
     function getWinner() public view returns(address) {
         

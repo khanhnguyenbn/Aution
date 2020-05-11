@@ -1,7 +1,7 @@
 import web3 from './web3';
 
-const address = '0xF0946D07556778De1655C3ef76B1EA772835575C'; // THE CONTRACT ADDRESS
-const abi =[
+const address = '0x250244e6EC4f418591BDCCFe311B67efadFE2A2a'; // THE CONTRACT ADDRESS
+const abi = [
 	{
 		"inputs": [
 			{

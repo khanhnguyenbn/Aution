@@ -73,6 +73,7 @@
             <h6>
               <b>STATE OF AUCTION: {{auctionState}}</b>
             </h6>
+            <h6 v-if="auctionState != 'RUNNING'">WINNER: {{winner}}</h6>
             <!-- <p class="vote"><strong>91%</strong> of buyers enjoyed this product! <strong>(87 votes)</strong></p> -->
             <!-- <h5 class="sizes">sizes:
 							<span class="size" data-toggle="tooltip" title="small">s</span>
@@ -87,11 +88,25 @@
             </h5>-->
             <div class="action">
               <button
+                v-if="isAllowDeposit"
+                class="add-to-cart btn btn-default"
+                type="button"
+                @click="handleJoin()"
+              >Join</button>
+              <button
                 v-if="isAllowBid"
                 class="add-to-cart btn btn-default"
                 type="button"
                 v-b-modal.modal-prevent-closing
               >BID</button>
+
+              <button
+                v-if="isAllowWinnerTransferMoney"
+                class="add-to-cart btn btn-default"
+                type="button"
+                @click="handleWinnerTransferMoney()"
+              >Transfer Money</button>
+
               <button
                 v-if="isAllowFinalize"
                 class="add-to-cart btn btn-default"
@@ -157,7 +172,7 @@ import web3 from "../../contracts/web3";
 import auction from "../../contracts/auctionInstance";
 import auctionBox from "../../contracts/auctionBoxInstance";
 import TimeConverterUtil from "../Utils/TimeConverterUtil";
-import AuctionUtil from "../Utils/AuctionUtil"
+import AuctionUtil from "../Utils/AuctionUtil";
 
 export default {
   name: "AutionDetail",
@@ -176,11 +191,15 @@ export default {
       bidPrice: "",
       auctionAddress: "",
       bidsHistory: [],
+      winner: "",
+      amountOfDeposit: "2",
 
+      isAllowDeposit: false,
       isAllowBid: false,
       isAllowFinalize: false,
+      isAllowWinnerTransferMoney: false,
       isAllowWinnerDoAfter: false,
-      isAllowRefunForFailBidder: false,
+      isAllowRefunForFailBidder: false
     };
   },
   beforeMount() {
@@ -192,12 +211,12 @@ export default {
         this.auctionAddress = aution;
         this.getBidsHistory(aution);
 
-        auction(aution)
-          .methods.getLengthOfBidList()
-          .call()
-          .then(len => {
-            console.log("len is " + len);
-          });
+        // auction(aution)
+        //   .methods.getLengthOfBidList()
+        //   .call()
+        //   .then(len => {
+        //     console.log("len is " + len);
+        //   });
 
         auction(aution)
           .methods.returnContents()
@@ -218,6 +237,25 @@ export default {
           });
 
         auction(aution)
+          .methods.getWinner()
+          .call()
+          .then(winner => {
+            this.winner = winner;
+            console.log("winner: " + winner);
+          });
+
+        auction(aution)
+          .methods.isAllowDeposit(
+            web3.eth.accounts.givenProvider.selectedAddress,
+            new Date().getTime()
+          )
+          .call()
+          .then(isAllow => {
+            this.isAllowDeposit = isAllow;
+            console.log("isAllowDeposit: " + isAllow);
+          });
+
+        auction(aution)
           .methods.isAllowBid(
             web3.eth.accounts.givenProvider.selectedAddress,
             new Date().getTime()
@@ -228,7 +266,7 @@ export default {
             console.log("isAllowBid: " + isAllow);
           });
 
-          auction(aution)
+        auction(aution)
           .methods.isAllowFinalize(
             web3.eth.accounts.givenProvider.selectedAddress
           )
@@ -238,7 +276,17 @@ export default {
             console.log("isAllowFinalize: " + isAllow);
           });
 
-          auction(aution)
+        auction(aution)
+          .methods.isAllowWinnerTransferMoney(
+            web3.eth.accounts.givenProvider.selectedAddress
+          )
+          .call()
+          .then(isAllow => {
+            this.isAllowWinnerTransferMoney = isAllow;
+            console.log("isAllowWinnerTransferMoney: " + isAllow);
+          });
+
+        auction(aution)
           .methods.isAllowWinnerDoAfter(
             web3.eth.accounts.givenProvider.selectedAddress
           )
@@ -248,7 +296,7 @@ export default {
             console.log("isAllowWinnerDoAfter: " + isAllow);
           });
 
-          auction(aution)
+        auction(aution)
           .methods.isAllowRefun(
             web3.eth.accounts.givenProvider.selectedAddress,
             new Date().getTime()
@@ -258,9 +306,12 @@ export default {
             this.isAllowRefunForFailBidder = isAllow;
             console.log("isAllowRefunForFailBidder: " + isAllow);
           });
-
-          
       });
+  },
+  updated(){
+
+    
+
   },
   methods: {
     handleSubmit() {
@@ -280,13 +331,11 @@ export default {
       console.log("selectedAuction: " + selectedAuction);
       // placeBid in Auction contract
       selectedAuction.methods
-        .placeBid()
+        .placeBid(bidPriceWei)
         .send({
-          from: fromAddress,
-          value: bidPriceWei
+          from: fromAddress
         })
         .then(() => {
-          // increase the number of bidders
           return auction(this.auctionAddress)
             .methods.getHighestPrice()
             .call();
@@ -351,7 +400,6 @@ export default {
           });
       });
 
-      // console.log("Clicked ... ");
     },
     handleCanotReceive() {
       web3.eth.getAccounts().then(accounts => {
@@ -386,6 +434,55 @@ export default {
           .then(() => {
             // this.isFin = false;
             // this.finalizeStatus = "finalized";
+          });
+      });
+    },
+    handleJoin() {
+      web3.eth.getAccounts().then(accounts => {
+        console.log("accounts[0]" + accounts[0]);
+        console.log(
+          "given: " + web3.eth.accounts.givenProvider.selectedAddress
+        );
+        // set the address as the parameter
+        const selectedAuction = auction(this.auctionAddress);
+        const amount = web3.utils.toWei(this.amountOfDeposit, "ether");
+        // finalizeAuction in Auction contract
+        selectedAuction.methods
+          .payDeposit()
+          .send({
+            from: accounts[0],
+            value: amount
+          })
+          .then(() => {
+            // this.isFin = false;
+            // this.finalizeStatus = "finalized";
+            this.isAllowDeposit = false;
+          });
+      });
+    },
+    handleWinnerTransferMoney() {
+      web3.eth.getAccounts().then(accounts => {
+        console.log("accounts[0]" + accounts[0]);
+        console.log(
+          "given: " + web3.eth.accounts.givenProvider.selectedAddress
+        );
+        // set the address as the parameter
+        const selectedAuction = auction(this.auctionAddress);
+        selectedAuction.methods
+          .getDeposit(web3.eth.accounts.givenProvider.selectedAddress)
+          .call()
+          .then(amount => {
+            console.log("amount of deposit: " + amount);
+
+            selectedAuction.methods
+              .getHighestPrice()
+              .call()
+              .then(highestPrice => {
+                selectedAuction.methods.payMoneyOfWinner().send({
+                  from: accounts[0],
+                  value: highestPrice - amount
+                });
+              });
           });
       });
     }

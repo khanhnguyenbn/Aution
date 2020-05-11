@@ -6,10 +6,12 @@ function getStringState(state) {
         case 1:
             return "RUNNING";
         case 2:
-            return "FINALIZE";
+            return "FINALIZED - Waiting for transfer money";
         case 3:
-            return "DONE";
+            return "Money was transfered";
         case 4:
+            return "DONE";
+        case 5:
             return "FAILSE";
     }
 }

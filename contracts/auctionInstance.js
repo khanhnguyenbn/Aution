@@ -123,12 +123,31 @@ const abi = [
 	{
 		"inputs": [
 			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "deposit",
+		"outputs": [
+			{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
 			}
 		],
-		"name": "bidsList",
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "depositList",
 		"outputs": [
 			{
 				"internalType": "address payable",
@@ -192,6 +211,25 @@ const abi = [
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_senderAddress",
+				"type": "address"
+			}
+		],
+		"name": "getDeposit",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "getHighestPrice",
 		"outputs": [
@@ -219,12 +257,12 @@ const abi = [
 	},
 	{
 		"inputs": [],
-		"name": "getLengthOfBidList",
+		"name": "getWinner",
 		"outputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "address",
 				"name": "",
-				"type": "uint256"
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -283,6 +321,30 @@ const abi = [
 			}
 		],
 		"name": "isAllowBid",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_senderAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_currentTime",
+				"type": "uint256"
+			}
+		],
+		"name": "isAllowDeposit",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -375,8 +437,40 @@ const abi = [
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_senderAddress",
+				"type": "address"
+			}
+		],
+		"name": "isAllowWinnerTransferMoney",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
-		"name": "placeBid",
+		"name": "payDeposit",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "payMoneyOfWinner",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -391,12 +485,18 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "_currentTime",
+				"name": "_amount",
 				"type": "uint256"
 			}
 		],
-		"name": "refunForFaileBidder",
-		"outputs": [],
+		"name": "placeBid",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
@@ -487,6 +587,25 @@ const abi = [
 	{
 		"inputs": [],
 		"name": "startTime",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "winnerPayment",
 		"outputs": [
 			{
 				"internalType": "uint256",
