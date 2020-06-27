@@ -9,7 +9,7 @@ library UserInformation {
        string ownerName;
        string ownerPhoneNumber;
        string ownerAddress;
-    }    
+    }
 }
 
 contract AuctionBox {
@@ -121,6 +121,7 @@ contract Auction {
     
     
     
+    
     ///////// Function ////////////////////
     
     /** @dev constructor to creat an auction
@@ -192,6 +193,7 @@ contract Auction {
         highestBidder = msg.sender;
         
         bidsHistory[msg.sender].push(_amount);
+        
         
         return true;
     }

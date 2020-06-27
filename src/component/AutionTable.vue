@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <button v-on:click="testEvent()"></button>
+    <!-- <button v-on:click="testEvent()"></button> -->
     <table>
       <thead>
         <tr>
@@ -29,6 +29,8 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- <DataTable></DataTable> -->
 
     <h2 class="text-center">CREATE AUCTION</h2>
 
@@ -61,7 +63,6 @@
           <label for="Description">Description</label>
           <b-form-textarea id="Description" v-model="description" rows="5" />
         </div>
-
       </b-col>
 
       <b-col class="b-row">
@@ -135,14 +136,19 @@
 import web3 from "../../contracts/web3";
 import auction from "../../contracts/auctionInstance";
 import auctionBox from "../../contracts/auctionBoxInstance";
+import DataTable from "./Table";
+// import SidebarMenu from "./SidebarMenu";
 import datetime from "vuejs-datetimepicker";
-import  TimeConverterUtil from "../Utils/TimeConverterUtil"
-import AuctionUtil from "../Utils/AuctionUtil"
+import TimeConverterUtil from "../Utils/TimeConverterUtil";
+import AuctionUtil from "../Utils/AuctionUtil";
+
+import axios from "axios";
 
 export default {
   name: "aution-table",
   components: {
-    datetime
+    datetime,
+    DataTable
   },
   data() {
     return {
@@ -199,12 +205,21 @@ export default {
               autionInfo.startPrice = web3.utils.fromWei(list[2], "ether");
               autionInfo.highestPrice = web3.utils.fromWei(list[3], "ether");
               autionInfo.state = list[5];
-              autionInfo.startTime = TimeConverterUtil.toString(Number(list[7]));
+              autionInfo.startTime = TimeConverterUtil.toString(
+                Number(list[7])
+              );
               autionInfo.endTime = TimeConverterUtil.toString(Number(list[8]));
               this.autionList.push(autionInfo);
             });
         }
       });
+  },
+  mounted() {
+    axios
+    .get("http://127.0.0.1:8086/auctions")
+    .then(response => 
+      console.log("response: " + JSON.stringify(response.data.data))
+    );
   },
   methods: {
     createAuction() {
@@ -326,7 +341,7 @@ export default {
 </script>
 
 <style scoped>
-#app {
+/* #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -361,7 +376,7 @@ button {
 
 button:hover {
   background-color: white; /* Green */
-  color: #008cba;
+/* color: #008cba;
   border: #008cba 3px solid;
 }
 
@@ -374,5 +389,5 @@ img {
   height: 32px;
   margin-top: 16px;
   margin-left: 8px;
-}
+} */
 </style>
