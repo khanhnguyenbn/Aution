@@ -164,6 +164,10 @@
         <h6>Address: {{ownerAddress}}</h6>
       </div>
     </div>
+
+    <div class="row">
+      <b-table striped hover :items="items" :fields="fields"></b-table>
+    </div>
   </div>
 </template>
 
@@ -199,7 +203,36 @@ export default {
       isAllowFinalize: false,
       isAllowWinnerTransferMoney: false,
       isAllowWinnerDoAfter: false,
-      isAllowRefunForFailBidder: false
+      isAllowRefunForFailBidder: false,
+
+
+      fields: [
+        // {
+        //   label: "ID",
+        //   key: "id"
+        // },
+        {
+          label: "Type",
+          key: "actionTypeString",
+          sortable: true
+        },
+        {
+          label: "Amount(ETH)",
+          key: "amount",
+          sortable: true
+        },
+        {
+          label: "Time",
+          key: "createdDate",
+          sortable: true
+        },
+        {
+          label: "Wallet",
+          key: "walletAddress",
+          sortable: true
+        }
+      ],
+      items: []
     };
   },
   beforeMount() {
@@ -306,6 +339,28 @@ export default {
             this.isAllowRefunForFailBidder = isAllow;
             console.log("isAllowRefunForFailBidder: " + isAllow);
           });
+
+        auction(aution)
+          .methods.getActionHistory()
+          .call()
+          .then(originalList => {
+
+              var actionList = [];
+
+              for (let index = 0; index < originalList.length; index++) {
+                const originalAction = originalList[index];
+
+                let action = {};
+                action.createdDate = TimeConverterUtil.toString(Number(originalAction[0]));
+                action.actionTypeString = AuctionUtil.getStringActionType(Number(originalAction[1]));
+                action.walletAddress = originalAction[2];
+                action.amount = web3.utils.fromWei(originalAction[3], "ether");
+
+                actionList.push(action);
+              }
+
+              this.items = actionList;
+          });
       });
   },
   updated(){
@@ -331,7 +386,7 @@ export default {
       console.log("selectedAuction: " + selectedAuction);
       // placeBid in Auction contract
       selectedAuction.methods
-        .placeBid(bidPriceWei)
+        .placeBid(bidPriceWei, new Date().getTime())
         .send({
           from: fromAddress
         })
@@ -448,7 +503,7 @@ export default {
         const amount = web3.utils.toWei(this.amountOfDeposit, "ether");
         // finalizeAuction in Auction contract
         selectedAuction.methods
-          .payDeposit()
+          .payDeposit(new Date().getTime())
           .send({
             from: accounts[0],
             value: amount
@@ -478,7 +533,7 @@ export default {
               .getHighestPrice()
               .call()
               .then(highestPrice => {
-                selectedAuction.methods.payMoneyOfWinner().send({
+                selectedAuction.methods.payMoneyOfWinner(new Date().getTime()).send({
                   from: accounts[0],
                   value: highestPrice - amount
                 });

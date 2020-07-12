@@ -65,6 +65,40 @@ const abi = [
 		"type": "constructor"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "actionHistory",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "time",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "actionType",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "auctionState",
 		"outputs": [
@@ -189,6 +223,41 @@ const abi = [
 		"name": "finalizeBySystem",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getActionHistory",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "time",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "actionType",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct UserInformation.action[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -469,7 +538,13 @@ const abi = [
 		"type": "function"
 	},
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_currentTime",
+				"type": "uint256"
+			}
+		],
 		"name": "payDeposit",
 		"outputs": [
 			{
@@ -482,7 +557,13 @@ const abi = [
 		"type": "function"
 	},
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_currentTime",
+				"type": "uint256"
+			}
+		],
 		"name": "payMoneyOfWinner",
 		"outputs": [
 			{
@@ -499,6 +580,11 @@ const abi = [
 			{
 				"internalType": "uint256",
 				"name": "_amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_currentTime",
 				"type": "uint256"
 			}
 		],
