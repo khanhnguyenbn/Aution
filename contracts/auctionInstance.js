@@ -86,7 +86,7 @@ const abi = [
 			},
 			{
 				"internalType": "address",
-				"name": "sender",
+				"name": "walletAddress",
 				"type": "address"
 			},
 			{
@@ -243,7 +243,7 @@ const abi = [
 					},
 					{
 						"internalType": "address",
-						"name": "sender",
+						"name": "walletAddress",
 						"type": "address"
 					},
 					{

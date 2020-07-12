@@ -10,6 +10,13 @@ library UserInformation {
        string ownerPhoneNumber;
        string ownerAddress;
     }
+    
+    struct action {
+        uint time;
+        uint actionType;
+        address walletAddress;
+        uint amount;
+    }
 }
 
 contract AuctionBox {
@@ -119,17 +126,12 @@ contract Auction {
     // to save history of bid tracsaction
     mapping(address => uint[]) public bidsHistory;
     
+    UserInformation.action[] public actionHistory;
     
     
     
-    ///////// Function ////////////////////
     
-    /** @dev constructor to creat an auction
-      * @param _owner who call createAuction() in AuctionBox contract
-      * @param _title the title of the auction
-      * @param _startPrice the start price of the auction
-      * @param _description the description of the auction
-      */
+    
       
     constructor(
         uint _id,
@@ -166,7 +168,7 @@ contract Auction {
     }
     
       
-    function payDeposit() public payable notOwner returns(bool) {
+    function payDeposit(uint _currentTime) public payable notOwner returns(bool) {
         
         require(auctionState == State.Running);
         require(deposit[msg.sender] == 0);
@@ -174,12 +176,21 @@ contract Auction {
         deposit[msg.sender] = msg.value;
         depositList.push(msg.sender);
         
+        UserInformation.action memory action;
+        action.time = _currentTime;
+        action.actionType = 1;
+        action.walletAddress = msg.sender;
+        action.amount = msg.value;
+        
+        actionHistory.push(action);
+        
+        
         return true;
         
     }
     
     
-    function placeBid(uint _amount) public returns(bool) {
+    function placeBid(uint _amount, uint _currentTime) public returns(bool) {
         require(auctionState == State.Running);
         require(msg.sender != owner);
         require(_amount >= startPrice, "your bid must greater than equal startPrice");
@@ -193,6 +204,14 @@ contract Auction {
         highestBidder = msg.sender;
         
         bidsHistory[msg.sender].push(_amount);
+        
+        UserInformation.action memory action;
+        action.time = _currentTime;
+        action.actionType = 2;
+        action.walletAddress = msg.sender;
+        action.amount = _amount;
+        
+        actionHistory.push(action);
         
         
         return true;
@@ -259,7 +278,7 @@ contract Auction {
         }
     }
     
-    function payMoneyOfWinner() public payable returns(bool) {
+    function payMoneyOfWinner(uint _currentTime) public payable returns(bool) {
         require(auctionState == State.Finalized);
         require(msg.sender == highestBidder, "Is not highestBidder");
         
@@ -269,6 +288,14 @@ contract Auction {
         winnerPayment[msg.sender] = msg.value;
         
         auctionState = State.Money_Transfered;
+        
+        UserInformation.action memory action;
+        action.time = _currentTime;
+        action.actionType = 3;
+        action.walletAddress = msg.sender;
+        action.amount = msg.value;
+        
+        actionHistory.push(action);
         
         return true;
     }
@@ -445,5 +472,10 @@ contract Auction {
     function getWinner() public view returns(address) {
         
         return highestBidder;
+    }
+    
+    
+    function getActionHistory() public view returns(UserInformation.action[] memory) {
+        return actionHistory;
     }
 }
