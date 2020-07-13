@@ -1,5 +1,6 @@
 import web3 from './web3';
 
+
 const abi = [
 	{
 		"inputs": [
@@ -9,12 +10,10 @@ const abi = [
 				"type": "bytes"
 			}
 		],
-		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "constructor"
 	},
 	{
-		"constant": true,
 		"inputs": [
 			{
 				"internalType": "address",
@@ -30,12 +29,10 @@ const abi = [
 				"type": "uint256"
 			}
 		],
-		"payable": false,
 		"stateMutability": "view",
 		"type": "function"
 	},
 	{
-		"constant": true,
 		"inputs": [],
 		"name": "getId",
 		"outputs": [
@@ -45,12 +42,10 @@ const abi = [
 				"type": "bytes"
 			}
 		],
-		"payable": false,
 		"stateMutability": "view",
 		"type": "function"
 	},
 	{
-		"constant": true,
 		"inputs": [],
 		"name": "id",
 		"outputs": [
@@ -60,12 +55,10 @@ const abi = [
 				"type": "bytes"
 			}
 		],
-		"payable": false,
 		"stateMutability": "view",
 		"type": "function"
 	},
 	{
-		"constant": true,
 		"inputs": [
 			{
 				"internalType": "address",
@@ -81,12 +74,10 @@ const abi = [
 				"type": "bool"
 			}
 		],
-		"payable": false,
 		"stateMutability": "view",
 		"type": "function"
 	},
 	{
-		"constant": true,
 		"inputs": [
 			{
 				"internalType": "address",
@@ -102,12 +93,10 @@ const abi = [
 				"type": "bool"
 			}
 		],
-		"payable": false,
 		"stateMutability": "view",
 		"type": "function"
 	},
 	{
-		"constant": true,
 		"inputs": [
 			{
 				"internalType": "address",
@@ -123,12 +112,10 @@ const abi = [
 				"type": "uint256"
 			}
 		],
-		"payable": false,
 		"stateMutability": "view",
 		"type": "function"
 	},
 	{
-		"constant": false,
 		"inputs": [],
 		"name": "payDeposit",
 		"outputs": [
@@ -138,12 +125,10 @@ const abi = [
 				"type": "bool"
 			}
 		],
-		"payable": true,
 		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
-		"constant": false,
 		"inputs": [],
 		"name": "payMoney",
 		"outputs": [
@@ -153,12 +138,10 @@ const abi = [
 				"type": "bool"
 			}
 		],
-		"payable": true,
 		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
-		"constant": false,
 		"inputs": [
 			{
 				"internalType": "address payable[]",
@@ -168,21 +151,17 @@ const abi = [
 		],
 		"name": "refunForLoser",
 		"outputs": [],
-		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": false,
 		"inputs": [],
 		"name": "refundForWinner",
 		"outputs": [],
-		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"constant": false,
 		"inputs": [
 			{
 				"internalType": "address payable",
@@ -192,7 +171,6 @@ const abi = [
 		],
 		"name": "transferToOwner",
 		"outputs": [],
-		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
 	}
